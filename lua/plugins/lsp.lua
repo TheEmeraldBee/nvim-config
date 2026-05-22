@@ -69,6 +69,19 @@ return {
         cmd = { "clangd", "--background-index", "--clang-tidy" },
       })
 
+      local hover = function()
+        vim.lsp.buf.hover({
+          border = "rounded",
+          max_width = 100,
+          max_height = 30,
+          focusable = true,
+        })
+      end
+
+      local signature = function()
+        vim.lsp.buf.signature_help({ border = "rounded" })
+      end
+
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(args)
           local buf = args.buf
@@ -76,11 +89,25 @@ return {
           map("gd", vim.lsp.buf.definition)
           map("gr", vim.lsp.buf.references)
           map("gi", vim.lsp.buf.implementation)
-          map("K", vim.lsp.buf.hover)
+          map("K", hover)
+          map("<C-k>", signature)
           map("<leader>rn", vim.lsp.buf.rename)
           map("<leader>ca", vim.lsp.buf.code_action)
           map("[d", vim.diagnostic.goto_prev)
           map("]d", vim.diagnostic.goto_next)
+        end,
+      })
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "markdown",
+        callback = function(args)
+          local buf = args.buf
+          local win = vim.api.nvim_get_current_win()
+          local cfg = vim.api.nvim_win_get_config(win)
+          if cfg.relative == "" then return end
+          vim.wo[win].conceallevel = 2
+          vim.wo[win].concealcursor = "n"
+          pcall(vim.treesitter.start, buf, "markdown")
         end,
       })
     end,

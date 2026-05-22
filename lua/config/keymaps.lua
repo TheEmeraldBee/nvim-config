@@ -1,5 +1,6 @@
 local map = vim.keymap.set
 
+map("n", ";w", "<cmd>write<cr>", { desc = "Write file" })
 map("n", ";q", "<cmd>bdelete<cr>", { desc = "Close buffer" })
 map("n", ";Q", "<cmd>q<cr>", { desc = "Quit window" })
 map("n", ";<C-q>", "<cmd>qall<cr>", { desc = "Quit all" })
@@ -32,7 +33,9 @@ map("n", "<M-c>", "<cmd>ClaudeCode<cr>", { desc = "Toggle Claude Code" })
 map("t", "<M-c>", "<C-\\><C-n><cmd>ClaudeCode<cr>", { desc = "Toggle Claude Code" })
 map("i", "<M-c>", "<Esc><cmd>ClaudeCode<cr>", { desc = "Toggle Claude Code" })
 
-map("n", "<leader>k", vim.lsp.buf.hover, { desc = "Hover" })
+map("n", "<leader>k", function()
+  vim.lsp.buf.hover({ border = "rounded", max_width = 100, max_height = 30 })
+end, { desc = "Hover" })
 map({ "n", "v" }, "<leader>a", vim.lsp.buf.code_action, { desc = "Code action" })
 
 map("n", "<leader>xl", function()

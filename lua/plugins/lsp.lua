@@ -1,5 +1,14 @@
 return {
   {
+    "folke/lazydev.nvim",
+    ft = "lua",
+    opts = {
+      library = {
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
+    },
+  },
+  {
     "mason-org/mason.nvim",
     opts = {},
   },
@@ -23,16 +32,25 @@ return {
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
-    dependencies = { "saghen/blink.cmp" },
+    dependencies = { "hrsh7th/cmp-nvim-lsp" },
     config = function()
-      local ok, blink = pcall(require, "blink.cmp")
-      local capabilities = ok and blink.get_lsp_capabilities() or vim.lsp.protocol.make_client_capabilities()
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      local ok, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+      if ok then
+        capabilities = cmp_lsp.default_capabilities(capabilities)
+      end
       vim.lsp.config("*", { capabilities = capabilities })
 
       vim.lsp.config("lua_ls", {
         settings = {
           Lua = {
-            workspace = { checkThirdParty = false },
+            runtime = { version = "LuaJIT" },
+            diagnostics = { globals = { "vim" } },
+            workspace = {
+              checkThirdParty = false,
+              library = vim.api.nvim_get_runtime_file("", true),
+            },
+            completion = { callSnippet = "Replace" },
             telemetry = { enable = false },
           },
         },

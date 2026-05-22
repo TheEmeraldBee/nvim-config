@@ -23,7 +23,12 @@ return {
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
+    dependencies = { "saghen/blink.cmp" },
     config = function()
+      local ok, blink = pcall(require, "blink.cmp")
+      local capabilities = ok and blink.get_lsp_capabilities() or vim.lsp.protocol.make_client_capabilities()
+      vim.lsp.config("*", { capabilities = capabilities })
+
       vim.lsp.config("lua_ls", {
         settings = {
           Lua = {

@@ -47,6 +47,8 @@ map("n", "<leader>xL", function()
   vim.diagnostic.config({ virtual_lines = not all and true or { current_line = true } })
 end, { desc = "Toggle inline diagnostics (all lines)" })
 
+map("n", "U", "<C-r>", { desc = "Redo" })
+
 map("v", "J", ":m '>+1<cr>gv=gv", { desc = "Move selection down" })
 map("v", "K", ":m '<-2<cr>gv=gv", { desc = "Move selection up" })
 

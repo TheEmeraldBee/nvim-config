@@ -13,7 +13,8 @@ return {
       { "<leader>fb", function() require("telescope.builtin").buffers() end, desc = "Buffers" },
       { "<leader>fh", function() require("telescope.builtin").help_tags() end, desc = "Help tags" },
       { "<leader>fr", function() require("telescope.builtin").resume() end, desc = "Resume" },
-      { "<leader>fd", function() require("telescope.builtin").diagnostics() end, desc = "Diagnostics" },
+      { "<leader>fd", function() require("telescope.builtin").diagnostics({ bufnr = 0 }) end, desc = "Diagnostics (buffer)" },
+      { "<leader>fD", function() require("telescope.builtin").diagnostics() end, desc = "Diagnostics (workspace)" },
       { "<leader>fs", function() require("telescope.builtin").lsp_document_symbols() end, desc = "Doc symbols" },
     },
     config = function()

@@ -33,6 +33,24 @@ map("t", "<M-c>", "<C-\\><C-n><cmd>ClaudeCode<cr>", { desc = "Toggle Claude Code
 map("i", "<M-c>", "<Esc><cmd>ClaudeCode<cr>", { desc = "Toggle Claude Code" })
 
 map("n", "<leader>k", vim.lsp.buf.hover, { desc = "Hover" })
+map({ "n", "v" }, "<leader>a", vim.lsp.buf.code_action, { desc = "Code action" })
+
+map("n", "<leader>xl", function()
+  local cfg = vim.diagnostic.config() or {}
+  local on = cfg.virtual_lines and cfg.virtual_lines ~= false
+  vim.diagnostic.config({ virtual_lines = not on and { current_line = true } or false })
+end, { desc = "Toggle inline diagnostics (current line)" })
+
+map("n", "<leader>xL", function()
+  local cfg = vim.diagnostic.config() or {}
+  local all = type(cfg.virtual_lines) == "table" and cfg.virtual_lines.current_line == nil
+  vim.diagnostic.config({ virtual_lines = not all and true or { current_line = true } })
+end, { desc = "Toggle inline diagnostics (all lines)" })
 
 map("v", "J", ":m '>+1<cr>gv=gv", { desc = "Move selection down" })
 map("v", "K", ":m '<-2<cr>gv=gv", { desc = "Move selection up" })
+
+map("n", "gn", "<cmd>bnext<cr>", { desc = "Next buffer" })
+map("n", "gp", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
+map({ "n", "v", "o" }, "gh", "^", { desc = "First non-whitespace char" })
+map({ "n", "v", "o" }, "gl", "$", { desc = "Last char" })

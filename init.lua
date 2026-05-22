@@ -12,4 +12,5 @@ vim.o.swapfile = false
 
 require("config.lazy")
 require("config.keymaps")
+require("config.diagnostics")
 

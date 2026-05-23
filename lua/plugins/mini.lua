@@ -11,6 +11,12 @@ return {
     opts = {},
   },
   {
+    "echasnovski/mini.bufremove",
+    version = "*",
+    event = "VeryLazy",
+    opts = {},
+  },
+  {
     "echasnovski/mini.animate",
     version = "*",
     event = "VeryLazy",
@@ -93,28 +99,6 @@ return {
     version = "*",
     event = { "BufReadPost", "BufNewFile" },
     opts = {},
-  },
-  {
-    "echasnovski/mini.starter",
-    version = "*",
-    event = "VimEnter",
-    config = function()
-      local starter = require("mini.starter")
-      starter.setup({
-        evaluate_single = true,
-        items = {
-          starter.sections.builtin_actions(),
-          starter.sections.recent_files(8, false),
-          starter.sections.recent_files(8, true),
-          starter.sections.sessions(5, true),
-        },
-        content_hooks = {
-          starter.gen_hook.adding_bullet(),
-          starter.gen_hook.indexing("all", { "Builtin actions" }),
-          starter.gen_hook.padding(3, 2),
-        },
-      })
-    end,
   },
   {
     "echasnovski/mini.map",

@@ -1,7 +1,9 @@
 local map = vim.keymap.set
 
 map("n", ";w", "<cmd>write<cr>", { desc = "Write file" })
-map("n", ";q", "<cmd>bdelete<cr>", { desc = "Close buffer" })
+map("n", ";q", function()
+  require("mini.bufremove").delete(0, false)
+end, { desc = "Close buffer (keep window)" })
 map("n", ";Q", "<cmd>q<cr>", { desc = "Quit window" })
 map("n", ";<C-q>", "<cmd>qall<cr>", { desc = "Quit all" })
 map("n", ";<C-r>", function()
@@ -29,9 +31,29 @@ for _, k in ipairs({ "h", "j", "k", "l" }) do
   map("v", "<M-" .. k .. ">", "<Esc><C-w>" .. k, { desc = "Window: move " .. k })
 end
 
+-- Alt+Shift+hjkl: resize the edge the key points at by 1% per press.
+-- Grows into a neighbor if there is one, shrinks when against the screen edge.
+local function resize(dir)
+  return function()
+    local horizontal = dir == "h" or dir == "l"
+    local total = horizontal and vim.o.columns or vim.o.lines
+    local step = math.max(1, math.floor(total * 0.05))
+    local sign = vim.fn.winnr(dir) ~= vim.fn.winnr() and "+" or "-"
+    vim.cmd((horizontal and "vertical " or "") .. "resize " .. sign .. step)
+  end
+end
+map("n", "<M-H>", resize("h"), { desc = "Resize window: left edge" })
+map("n", "<M-L>", resize("l"), { desc = "Resize window: right edge" })
+map("n", "<M-J>", resize("j"), { desc = "Resize window: bottom edge" })
+map("n", "<M-K>", resize("k"), { desc = "Resize window: top edge" })
+
 map("n", "<M-c>", "<cmd>ClaudeCode<cr>", { desc = "Toggle Claude Code" })
 map("t", "<M-c>", "<C-\\><C-n><cmd>ClaudeCode<cr>", { desc = "Toggle Claude Code" })
 map("i", "<M-c>", "<Esc><cmd>ClaudeCode<cr>", { desc = "Toggle Claude Code" })
+
+map("n", "<leader>/", function()
+  require("telescope.builtin").live_grep()
+end, { desc = "Global regex search" })
 
 map("n", "<leader>k", function()
   vim.lsp.buf.hover({ border = "rounded", max_width = 100, max_height = 30 })

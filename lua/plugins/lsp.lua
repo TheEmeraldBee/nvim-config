@@ -22,6 +22,7 @@ return {
       ensure_installed = {
         "lua_ls",
         "rust_analyzer",
+        "bacon-ls",
         "gopls",
         "pyright",
         "clangd",
@@ -56,14 +57,22 @@ return {
         },
       })
 
+      -- rust-analyzer handles semantics/proc-macros; bacon-ls owns
+      -- cargo/clippy diagnostics, so disable r-a's flycheck to avoid dupes.
       vim.lsp.config("rust_analyzer", {
         settings = {
           ["rust-analyzer"] = {
             cargo = { allFeatures = true },
-            checkOnSave = { command = "clippy" },
+            checkOnSave = false,
           },
         },
       })
+
+      -- bacon-ls: inline clippy/cargo diagnostics. Default cargo backend
+      -- runs cargo itself (no bacon.toml or separate process needed); the
+      -- <leader>cb bacon TUI complements it for live watching.
+      -- Defaults are fine: cargo backend, updateOnSave enabled.
+      vim.lsp.config("bacon_ls", {})
 
       vim.lsp.config("clangd", {
         cmd = { "clangd", "--background-index", "--clang-tidy" },
@@ -95,8 +104,29 @@ return {
           map("<leader>ca", vim.lsp.buf.code_action)
           map("[d", vim.diagnostic.goto_prev)
           map("]d", vim.diagnostic.goto_next)
+          map("<leader>cf", function() vim.lsp.buf.format({ async = true }) end)
+
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if client and client:supports_method("textDocument/formatting") then
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              group = vim.api.nvim_create_augroup("lsp_format_" .. buf, { clear = true }),
+              buffer = buf,
+              callback = function()
+                if vim.g.disable_autoformat or vim.b[buf].disable_autoformat then return end
+                vim.lsp.buf.format({ bufnr = buf, timeout_ms = 2000, id = client.id })
+              end,
+            })
+          end
         end,
       })
+
+      vim.api.nvim_create_user_command("FormatDisable", function(args)
+        if args.bang then vim.b.disable_autoformat = true else vim.g.disable_autoformat = true end
+      end, { bang = true, desc = "Disable LSP format-on-save" })
+      vim.api.nvim_create_user_command("FormatEnable", function()
+        vim.b.disable_autoformat = false
+        vim.g.disable_autoformat = false
+      end, { desc = "Re-enable LSP format-on-save" })
 
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "markdown",
